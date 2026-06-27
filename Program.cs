@@ -78,3 +78,20 @@ catch (ArgumentException ex)
 Console.WriteLine($"Caught: {ex.Message}");
 // these is the best are youbready to learn these journy tebgdtrebdhd
 }
+
+
+
+
+// student model
+// var s = new Student { Id = "S1", Name = "Abeba", Age = 20, GPA = 3.8m };
+// Console.WriteLine($"Student: {s.Name}, GPA: {s.GPA}");
+// These should throw — try each one:
+var students = new List<Student>
+{
+    new Student { Id = "S2", Name = "", Age = 20, GPA = 3.0m },
+    new Student { Id = "S3", Name = "Test", Age = 12, GPA = 3.0m },
+    new Student { Id = "S4", Name = "Test", Age = 18, GPA = 3.8m }
+};
+
+// run and execute the Student List
+students.ForEach(s => Console.WriteLine($"Student Information:StudentName = {s.Name},Age: {s.Age}, GPA: {s.GPA}"));
