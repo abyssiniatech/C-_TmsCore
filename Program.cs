@@ -125,5 +125,35 @@ public static class Program
         {
             Console.WriteLine($"Business rule: {ex.Message}");
         }
+
+
+
+        List<Student> students = new List<Student>
+        {
+            new Student { Id = "S1", studentName = "Abeba", Email = "abeba@example.com", Age = 22, GPA = 3.8m },
+            new Student { Id = "S2", studentName = "Kidane", Email = "kidane@example.com", Age = 21, GPA = 2.4m },
+            new Student { Id = "S3", studentName = "Dawit", Email = "dawit@example.com", Age = 20, GPA = 3.1m },
+            new Student { Id = "S4", studentName = "Sara", Email = "sara@example.com", Age = 23, GPA = 3.9m },
+            new Student { Id = "S5", studentName = "Frehiwot", Email = "frehiwot@example.com", Age = 19, GPA = 2.0m },
+            new Student { Id = "S6", studentName = "Yonas", Email = "yonas@example.com", Age = 24, GPA = 3.5m },
+            new Student { Id = "S7", studentName = "Meron", Email = "meron@example.com", Age = 22, GPA = 1.8m },
+            new Student { Id = "S8", studentName = "Tesfaye", Email = "tesfaye@example.com", Age = 21, GPA = 2.9m }
+        };
+        // Step 2 Build the Honors Leaderboard
+        var leaderboard = students
+        // TODO 1: Extract students where GPA is >= 3.5m
+        // TODO 2: Sort the remaining students by GPA descending
+        // TODO 3: Project the result so we only keep the 'Name' string
+        // TODO 4: Materialize the lazy query into a concrete List
+        ;
+        Console.WriteLine($"Found {leaderboard.Count} Honors Students:");
+        foreach (var name in leaderboard)
+        {
+            Console.WriteLine($"- {name}");
+        }
+
+
+
+
     }
 }
