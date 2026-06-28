@@ -1,97 +1,129 @@
-﻿// string? region=null;
+﻿
+// using System.Runtime.Intrinsics.Arm;
+// using Microsoft.VisualBasic;
 
-// string? upperRegion = region?.ToUpper();
-// Console.WriteLine($"Region (conditional): {upperRegion}");
-
-
-// string? upperRegions = region?.ToUpper();
-// Console.WriteLine($"Region (conditional): {upperRegions}");
-
-
-
-// string? region1="Addis ababa";
-// region1.ToUpper();
-// Console.WriteLine($"my region is= {region1}");
+// List<Student> students =
+// [
+// new Student { Id = "stu-01", studentName = "surafel Mengist", Email = "sura@gmail.com", Age = 34 },
+//     new Student { Id = "stu-02", studentName = "Abel Yosef", Email = "Abel@gmail.com", Age = 23 },
+//     new Student { Id = "stu-03", studentName = "Nahome yared", Email = "Nahome@gmail.com", Age = 14 },
+//     new Student { Id = "stu-04", studentName = "Aster awoke", Email = "Aster@gmail.com", Age = 65 }
+// ];
 
 
-// // datatypes in c# basic 
-// int age=12;
-// string FullName="Surafel mengist";
-// decimal tem=16.7m;
-// decimal money =23.5m;
-// DateTime date=DateTime.Now;
-// System.Console.WriteLine($"my name is {FullName} and i'm {age} years old and i have {money} and the weather condition for addis ababa is {tem} and today is :{date}");
+// // execute where, foreach, count, and other LINQ functions
 
+// foreach (var stud in students)
+// {
+//     Console.WriteLine($"{stud.Id}, {stud.studentName}, {stud.Email}, {stud.Age}");
+// }
 
-
-// Legacy implementation — the bug that caused the audit failure
-// double grantPerStudent = 1999.99;
-// double totalAllocation = grantPerStudent * 100_000;
-// Console.WriteLine($"Total allocated (double): {totalAllocation}");
-
-
-// // Fixed implementation — exact financial math
-// decimal grantPerStudents = 1999.99m;
-// decimal totalAllocations = grantPerStudents * 100_000m;
-// Console.WriteLine($"Total allocated (decimal): {totalAllocation}");
-// Console.WriteLine($"Total allocated (formatted): {totalAllocation:F2}");
+// Console.WriteLine("=============");
 
 
 
 
 
-// record in c# 
-
-
-     var enrollment = new EnrollmentRecord("STU-001", "CS-401", DateTime.UtcNow);
-    Console.WriteLine(enrollment);
-
-   var corrected = enrollment with { CourseCode = "CS-402" };
-    Console.WriteLine(corrected);
-
-    // student record in c#
-    var studentInfo = new StudentRecord(12,"surafel Mengist",DateTime.Now);
-    Console.WriteLine(studentInfo);
 
 
 
 
+// Console.WriteLine("=====forach======");
+// foreach (var item in students)
+// {
+//     if (item.Age == 23)
+//     {
+//         Console.WriteLine($"You are {item.studentName} and you are {item.Age} Years old");
+//     }
+// }
 
-    var course = new Course { Code = "CS-401", Title = "Advanced C#", Capacity = 30 };
-Console.WriteLine($"Course: {course.Title} (Capacity: {course.Capacity})");
-// Invalid capacity — should throw
-try
+// Console.WriteLine("========OrderByDescending=======");
+
+// // orderbt asending
+// var rank = students.OrderBy(s => s.GPA);
+// System.Console.WriteLine(rank);
+
+
+
+// var studentAges = students.Where(s => s.Age > 30);
+
+
+
+
+// Minimal domain types required by this program
+namespace TmsCore;
+
+public class Student
 {
-course.Capacity = -5;
-}
-catch (ArgumentOutOfRangeException ex)
-{
-Console.WriteLine($"Caught: {ex.Message}");
-}
-// Invalid title — should throw
-try
-{
-course.Title = "";
-}
-catch (ArgumentException ex)
-{
-Console.WriteLine($"Caught: {ex.Message}");
-// these is the best are youbready to learn these journy tebgdtrebdhd
+    public required string Id { get; set; }
+    public required string studentName { get; set; }
+    public required string Email { get; set; }
+    public int Age { get; set; }
+    public decimal GPA { get; set; }
 }
 
-
-
-
-// student model
-// var s = new Student { Id = "S1", Name = "Abeba", Age = 20, GPA = 3.8m };
-// Console.WriteLine($"Student: {s.Name}, GPA: {s.GPA}");
-// These should throw — try each one:
-var students = new List<Student>
+public class Course
 {
-    new Student { Id = "S2", Name = "", Age = 20, GPA = 3.0m },
-    new Student { Id = "S3", Name = "Test", Age = 12, GPA = 3.0m },
-    new Student { Id = "S4", Name = "Test", Age = 18, GPA = 3.8m }
-};
+    public required string Code { get; set; }
+    public required string Title { get; set; }
+    public int Capacity { get; set; }
+    public int EnrolledCount { get; set; }
+}
 
-// run and execute the Student List
-students.ForEach(s => Console.WriteLine($"Student Information:StudentName = {s.Name},Age: {s.Age}, GPA: {s.GPA}"));
+public class RegistrationResult
+{
+    public required string Student { get; set; }
+    public required string Course { get; set; }
+}
+
+public class EnrollmentService
+{
+    public RegistrationResult ProcessRegistration(Student? student, Course course)
+    {
+        if (student == null) throw new ArgumentNullException(nameof(student));
+        if (course == null) throw new ArgumentNullException(nameof(course));
+        if (course.EnrolledCount >= course.Capacity) throw new InvalidOperationException("Course is full");
+
+        // simulate enrollment
+        course.EnrolledCount++;
+        return new RegistrationResult { Student = student.Id ?? "N/A", Course = course.Code ?? "N/A" };
+    }
+}
+
+public static class Program
+{
+    public static void Main()
+    {
+        var service = new EnrollmentService();
+
+        // Test 1: Valid registration
+        Student validStudent = new Student { Id = "S1", studentName = "Abeba", Email = "abeba@example.com", Age = 20, GPA = 3.8m };
+        Course validCourse = new Course { Code = "CS-401", Title = "Advanced C#", Capacity = 30 };
+        RegistrationResult result = service.ProcessRegistration(validStudent, validCourse);
+
+        // Print the returned values directly to avoid assuming they are complex objects.
+        Console.WriteLine($"Enrolled: {result.Student ?? "N/A"} in {result.Course ?? "N/A"}");
+
+        // Test 2: Null student should throw
+        try
+        {
+            service.ProcessRegistration(null, validCourse);
+        }
+        catch (ArgumentNullException ex)
+        {
+            Console.WriteLine($"Guard caught: {ex.ParamName}");
+        }
+
+        // Test 3: Full course should throw
+        Course fullCourse = new Course { Code = "CS-402", Title = "Full Course", Capacity = 1 };
+        fullCourse.EnrolledCount = 1;
+        try
+        {
+            service.ProcessRegistration(validStudent, fullCourse);
+        }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Business rule: {ex.Message}");
+        }
+    }
+}
