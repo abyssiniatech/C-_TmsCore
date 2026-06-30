@@ -1,159 +1,99 @@
-﻿
-// using System.Runtime.Intrinsics.Arm;
-// using Microsoft.VisualBasic;
-
-// List<Student> students =
-// [
-// new Student { Id = "stu-01", studentName = "surafel Mengist", Email = "sura@gmail.com", Age = 34 },
-//     new Student { Id = "stu-02", studentName = "Abel Yosef", Email = "Abel@gmail.com", Age = 23 },
-//     new Student { Id = "stu-03", studentName = "Nahome yared", Email = "Nahome@gmail.com", Age = 14 },
-//     new Student { Id = "stu-04", studentName = "Aster awoke", Email = "Aster@gmail.com", Age = 65 }
-// ];
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TmsCore;
 
 
-// // execute where, foreach, count, and other LINQ functions
-
-// foreach (var stud in students)
-// {
-//     Console.WriteLine($"{stud.Id}, {stud.studentName}, {stud.Email}, {stud.Age}");
-// }
-
-// Console.WriteLine("=============");
-
-
-
-
-
-
-
-
-
-// Console.WriteLine("=====forach======");
-// foreach (var item in students)
-// {
-//     if (item.Age == 23)
-//     {
-//         Console.WriteLine($"You are {item.studentName} and you are {item.Age} Years old");
-//     }
-// }
-
-// Console.WriteLine("========OrderByDescending=======");
-
-// // orderbt asending
-// var rank = students.OrderBy(s => s.GPA);
-// System.Console.WriteLine(rank);
-
-
-
-// var studentAges = students.Where(s => s.Age > 30);
-
-
-
-
-// Minimal domain types required by this program
-namespace TmsCore;
-
-public class Student
+var sw = Stopwatch.StartNew();
+for (int i = 0; i < 5; i++)
 {
-    public required string Id { get; set; }
-    public required string studentName { get; set; }
-    public required string Email { get; set; }
-    public int Age { get; set; }
-    public decimal GPA { get; set; }
+    Thread.Sleep(300);
 }
 
-public class Course
-{
-    public required string Code { get; set; }
-    public required string Title { get; set; }
-    public int Capacity { get; set; }
-    public int EnrolledCount { get; set; }
-}
+Console.WriteLine($"Blocking Sequtial:{sw.ElapsedMilliseconds}ElapsedMilliseconds");
 
-public class RegistrationResult
-{
-    public required string Student { get; set; }
-    public required string Course { get; set; }
-}
+sw.Restart();
 
-public class EnrollmentService
+
+//    
+for (int i = 0; i < 5; i++)
 {
-    public RegistrationResult ProcessRegistration(Student? student, Course course)
+    await Task.Delay(300);
+}
+Console.WriteLine($"Async sequtial : {sw.ElapsedMilliseconds} ms");
+
+
+sw.Restart();
+var tasks = Enumerable.Range(0, 5).Select(_ => Task.Delay(300));
+await Task.WhenAll(tasks);
+Console.WriteLine($"Async Parallel: {sw.ElapsedMilliseconds} ms");
+
+sw.Restart();
+var student = await FetchStudentAsync("S1");
+Console.WriteLine($"Fetched student: {student.Id}, GPA: {student.GPA}");
+
+
+
+
+//   the second example 
+static async Task<Student> FetchStudentAsync(string id)
+{
+    Console.WriteLine($" Fetching {id}...");
+    await Task.Delay(300); // Simulate database latency
+    return new Student
     {
-        if (student == null) throw new ArgumentNullException(nameof(student));
-        if (course == null) throw new ArgumentNullException(nameof(course));
-        if (course.EnrolledCount >= course.Capacity) throw new InvalidOperationException("Course is full");
+        StudentId = $"{id}",
+        Id = $"{id}",
+        studentName = $"Student-{id}",
+        StudentName = $"Student-{id}",
+        Age = 20,
+        GPA = id switch
+        {
+            "S1" => 3.8m,
+            "S2" => 2.4m,
+            "S3" => 3.5m,
+            "S4" => 1.9m,
+            "S5" => 3.2m,
+            _ => 2.5m
+        }
+    };
+}
 
-        // simulate enrollment
-        course.EnrolledCount++;
-        return new RegistrationResult { Student = student.Id ?? "N/A", Course = course.Code ?? "N/A" };
+// Simple model classes used by the sample methods
+namespace TmsCore
+{
+    class Course
+    {
+        public required string Code { get; set; }
+        public required string StudentId { get; set; }
+        public required string Title { get; set; }
+        public int Capacity { get; set; }
     }
-}
 
-public static class Program
-{
-    public static void Main()
+    public class Student
     {
-        var service = new EnrollmentService();
+        // Required members expected by other code
+        public required string StudentId { get; set; }
+        public required string studentName { get; set; }
 
-        // Test 1: Valid registration
-        Student validStudent = new Student { Id = "S1", studentName = "Abeba", Email = "abeba@example.com", Age = 20, GPA = 3.8m };
-        Course validCourse = new Course { Code = "CS-401", Title = "Advanced C#", Capacity = 30 };
-        RegistrationResult result = service.ProcessRegistration(validStudent, validCourse);
-
-        // Print the returned values directly to avoid assuming they are complex objects.
-        Console.WriteLine($"Enrolled: {result.Student ?? "N/A"} in {result.Course ?? "N/A"}");
-
-        // Test 2: Null student should throw
-        try
+        // Legacy/alternate accessors
+        public string Id
         {
-            service.ProcessRegistration(null, validCourse);
-        }
-        catch (ArgumentNullException ex)
-        {
-            Console.WriteLine($"Guard caught: {ex.ParamName}");
+            get => StudentId;
+            set => StudentId = value;
         }
 
-        // Test 3: Full course should throw
-        Course fullCourse = new Course { Code = "CS-402", Title = "Full Course", Capacity = 1 };
-        fullCourse.EnrolledCount = 1;
-        try
+        public string StudentName
         {
-            service.ProcessRegistration(validStudent, fullCourse);
-        }
-        catch (InvalidOperationException ex)
-        {
-            Console.WriteLine($"Business rule: {ex.Message}");
+            get => studentName;
+            set => studentName = value;
         }
 
-//    next
-
-        List<Student> students = new List<Student>
-        {
-            new Student { Id = "S1", studentName = "Abeba", Email = "abeba@example.com", Age = 22, GPA = 3.8m },
-            new Student { Id = "S2", studentName = "Kidane", Email = "kidane@example.com", Age = 21, GPA = 2.4m },
-            new Student { Id = "S3", studentName = "Dawit", Email = "dawit@example.com", Age = 20, GPA = 3.1m },
-            new Student { Id = "S4", studentName = "Sara", Email = "sara@example.com", Age = 23, GPA = 3.9m },
-            new Student { Id = "S5", studentName = "Frehiwot", Email = "frehiwot@example.com", Age = 19, GPA = 2.0m },
-            new Student { Id = "S6", studentName = "Yonas", Email = "yonas@example.com", Age = 24, GPA = 3.5m },
-            new Student { Id = "S7", studentName = "Meron", Email = "meron@example.com", Age = 22, GPA = 1.8m },
-            new Student { Id = "S8", studentName = "Tesfaye", Email = "tesfaye@example.com", Age = 21, GPA = 2.9m }
-        };
-        // Step 2 Build the Honors Leaderboard
-        var leaderboard = students
-        // TODO 1: Extract students where GPA is >= 3.5m
-        // TODO 2: Sort the remaining students by GPA descending
-        // TODO 3: Project the result so we only keep the 'Name' string
-        // TODO 4: Materialize the lazy query into a concrete List
-        ;
-        Console.WriteLine($"Found {leaderboard.Count} Honors Students:");
-        foreach (var name in leaderboard)
-        {
-            Console.WriteLine($"- {name}");
-        }
-
-
-
-
+        public int Age { get; set; }
+        // Renamed to avoid ambiguity with other 'Age' symbols in scope
+        public int StudentAge { get; set; }
+        public decimal GPA { get; set; }
     }
 }
