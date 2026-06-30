@@ -61,6 +61,36 @@ static async Task<Student> FetchStudentAsync(string id)
     };
 }
 
+static async Task<Course> FetchCourseAsync(string code)
+{
+    Console.WriteLine($" Fetching {code}...");
+    await Task.Delay(300); // Simulate database latency
+    return new Course
+    {
+        Code = code,
+        StudentId = "S1",
+        Title = $"Course-{code}",
+        Capacity = 30
+    };
+}
+
+// the third method
+
+sw.Restart();
+// Start all fetches simultaneously students AND courses
+string[] studentIds = ["S1", "S2", "S3", "S4", "S5"];
+string[] courseCodes = ["CRS-101", "CRS-201", "CRS-301"];
+var studentTasks = studentIds.Select(id => FetchStudentAsync(id));
+var courseTasks = courseCodes.Select(code => FetchCourseAsync(code));
+// Both arrays load concurrently
+Student[] students = await Task.WhenAll(studentTasks);
+Course[] courses = await Task.WhenAll(courseTasks);
+Console.WriteLine($"\nLoaded {students.Length} students and {courses.Length} courses in {sw.ElapsedMilliseconds}ms");
+foreach (var s in students)
+{
+    Console.WriteLine($" {s.StudentName} GPA: {s.GPA}");
+}
+
 // Simple model classes used by the sample methods
 namespace TmsCore
 {
