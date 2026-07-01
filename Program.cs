@@ -162,8 +162,8 @@ namespace TmsCore
             int a = await Task.Run(() => Calculate1());
             int b = await Task.Run(() => Calculate2());
             int c = await Task.Run(() => Calculate3());
-
-            Console.WriteLine($"Results: {a}, {b}, {c}");
+            int d = await Calculate4Async();
+            Console.WriteLine($"Results: {a}, {b}, {c},{d}");
         }
 
         public static int Calculate1()
@@ -186,6 +186,13 @@ namespace TmsCore
             Thread.Sleep(3000);
             Console.WriteLine("Calculate three");
             return 50;
+        }
+
+        public static async Task<int> Calculate4Async()
+        {
+            await Task.Delay(3000);
+            Console.WriteLine("Calculate four");
+            return 400;
         }
     }
 }
