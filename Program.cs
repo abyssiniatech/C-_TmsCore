@@ -52,6 +52,36 @@
             {
                 Console.WriteLine($"Id: {student.Id}, Name: {student.Name}, Age: {student.Age}, Email: {student.Email}");
             }
+
+            // where and orderby method syntax
+            Console.WriteLine("All students older than 20:");
+            studentList = students.Where(s => s.Age > 20).OrderBy(s => s.Name).ToList();
+
+
+
+            foreach(var student in studentList){
+                
+                Console.WriteLine($"Id: {student.Id}, Name: {student.Name}, Age: {student.Age}, Email: {student.Email}");
+            }
+
+
+            string[] backend =["Next js","PHP","Node js","Python","Java"];
+            string[] frontend = ["React js","Angular","Vue js","Svelte","Ember js"];
+           Console.WriteLine(string.Join(", ", backend));
+           Console.WriteLine(string.Join(", ", frontend));
+
+            string[] allTechnologies = backend.Concat(frontend).ToArray();
+            Console.WriteLine("All Technologies:");
+            foreach (var tech in allTechnologies)
+            {
+                Console.WriteLine(tech);
+            }
+            //  dictionary to store student data
+            Dictionary<int, Student> studentDictionary = new Dictionary<int, Student>();
+            foreach (var student in students)
+            {
+                studentDictionary.Add(student.Id, student);
+            }
         }
     }
     }
